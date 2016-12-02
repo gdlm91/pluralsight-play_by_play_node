@@ -1,18 +1,9 @@
 let _ = require('lodash');
-let mongoose = require('mongoose');
-
-let catSchema = mongoose.Schema({
-    name: String,
-    age: Number
-});
-
-let Cat = mongoose.model('Cat', catSchema);
+let Cat = require('./cats.model.js');
 
 module.exports = function(app) {
 
-    let _cats = [];
-
-    //Create
+    /** Create */
     app.post('/cats', function(req, res) {
         let newCat = new Cat(req.body);
         newCat.save(function(err, data) {
@@ -23,7 +14,7 @@ module.exports = function(app) {
     })
 
 
-    //Read
+    /** Read */
     app.get('/cats', function(req, res) {
         Cat.find(function(err, data) {
             if(err) return res.json({info: 'error during find cats', err: err});
@@ -42,7 +33,7 @@ module.exports = function(app) {
         })
     })
 
-    //Update
+    /** Update */
     app.put('/cats/:id', function(req, res) {
         Cat.findByIdAndUpdate(req.params.id, req.body, function(err) {
             if(err) return res.json({info: 'error during updating cat', err: err});
@@ -52,7 +43,7 @@ module.exports = function(app) {
     })
 
 
-    //Delete
+    /** Delete */
     app.delete('/cats/:id', function(req, res) {
         Cat.findByIdAndRemove(req.params.id, function(err, data) {
             if(err) return res.json({info: 'error during deleting cat', err: err});

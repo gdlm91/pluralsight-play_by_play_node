@@ -4,17 +4,15 @@ let mongoose = require('mongoose');
 
 let app = express();
 
-mongoose.connect('mongodb://localhost/cats');
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', function(req, res) {
-    res.send('Hello World!');
+    res.send('Hello Pets!');
 })
 
-let cats = require('./routes/cats.js')(app);
+let pets = require('./pets/pets.routes.js')(app);
 
 app.listen(3000, function() {
-    console.log('Server running at port 3000');
+    console.log('Pets Server running at port 3000');
 })
