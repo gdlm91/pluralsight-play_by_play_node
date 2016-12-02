@@ -1,7 +1,10 @@
 let express = require('express');
 let bodyParser = require('body-parser');
+let mongoose = require('mongoose');
 
 let app = express();
+
+mongoose.connect('mongodb://localhost/cats');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

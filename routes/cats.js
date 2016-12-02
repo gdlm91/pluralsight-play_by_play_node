@@ -1,4 +1,12 @@
 let _ = require('lodash');
+let mongoose = require('mongoose');
+
+let catSchema = mongoose.Schema({
+    name: String,
+    age: Number
+});
+
+let Cat = mongoose.model('Cat', catSchema);
 
 module.exports = function(app) {
 
@@ -6,39 +14,51 @@ module.exports = function(app) {
 
     //Create
     app.post('/cats', function(req, res) {
-        _cats.push(req.body);
-        res.json(req.body);
+        let newCat = new Cat(req.body);
+        newCat.save(function(err, data) {
+            if(err) return res.json({info: 'error during cat create', err: err});
+
+            res.json({info: 'cat created successfully', data: data._doc});
+        })
     })
 
 
     //Read
     app.get('/cats', function(req, res) {
-        res.json(_cats);
+        Cat.find(function(err, data) {
+            if(err) return res.json({info: 'error during find cats', err: err});
+
+            res.json({info: 'cats found', data: data});
+        })
     })
 
-    app.get('/cats/:name', function(req, res) {
-        res.json(_.find(_cats, {name: req.params.name}));
+    app.get('/cats/:id', function(req, res) {
+        Cat.findById(req.params.id, function(err, data) {
+            if(err) return res.json({info: 'error during find the cat', err: err});
+
+            if(!data) return res.json({info: 'cat not found'});
+
+            res.json({info: 'cat found successfully', data: data});
+        })
     })
 
     //Update
-    app.put('/cats/:name', function(req, res) {
-        let catIndex = _.findIndex(_cats, {name: req.params.name});
-        _.merge(_cats[catIndex], req.body);
-        res.json(_cats[catIndex]);
+    app.put('/cats/:id', function(req, res) {
+        Cat.findByIdAndUpdate(req.params.id, req.body, function(err) {
+            if(err) return res.json({info: 'error during updating cat', err: err});
+
+            res.json({info: 'cat updated successfully', data: req.body});
+        })
     })
 
 
     //Delete
-    app.delete('/cats/:name', function(req, res) {
-        let deletedCat;
-        _cats = _.filter(_cats, function(cat) {
-            if(cat.name === req.params.name) {
-                deletedCat = cat;
-                return false;
-            }
-            return true;
+    app.delete('/cats/:id', function(req, res) {
+        Cat.findByIdAndRemove(req.params.id, function(err, data) {
+            if(err) return res.json({info: 'error during deleting cat', err: err});
+
+            res.json({info: 'cat deleted successfully', data: data});
         })
-        res.json(deletedCat);
     })
 
 }
